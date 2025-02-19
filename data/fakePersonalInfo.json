@@ -1,0 +1,29 @@
+{"T01":[
+    {
+        "uid":"12345678",
+        "Group":"MT1",
+        "mCoins":1000,
+        "Items":["11"],
+        "UsedItems":["11"],
+        "History":[
+                    {"Date":"2023/05/10","Description":"P","Amount":-100},
+                    {"Date":"2023/05/10","Description":"CA","Amount":200}
+                ]
+    },
+    {
+        "uid":"Test",
+        "Group":"MT2",
+        "mCoins":1000,
+        "Items":["11","00"],
+        "UsedItems":["00"],
+        "History":[
+                    {"Date":"2023/05/10","Description":"P","Amount":-100},
+                    {"Date":"2023/05/10","Description":"CA","Amount":200}
+                ]
+    }
+    ],
+
+"Staff":[
+        {"uid":"ericyeung"}
+    ]
+}

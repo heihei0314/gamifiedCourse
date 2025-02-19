@@ -1,0 +1,45 @@
+{"T01":[
+    {
+        "Group":"MT2",
+        "mCoins":1000,    
+        "Items":3
+    },
+    {
+        "Group":"MT1",
+        "mCoins":3000,
+        "Items":0
+    },
+    {
+        "Group":"MT3",
+        "mCoins":2000,
+        "Items":1
+    },
+    {
+        "Group":"MT4",
+        "mCoins":4000,
+        "Items":1
+    }
+    ],
+"T02":[
+    {
+        "Group":"MT1",
+        "mCoins":100,
+        "Items":2
+    },
+    {
+        "Group":"MT2",
+        "mCoins":300,
+        "Items":1
+    },
+    {
+        "Group":"MT3",
+        "mCoins":200,
+        "Items":1
+    },
+    {
+        "Group":"MT4",
+        "mCoins":400,
+        "Items":1
+    }
+    ]
+}

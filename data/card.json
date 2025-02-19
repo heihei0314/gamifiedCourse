@@ -1,0 +1,138 @@
+{"cards":[
+   
+    {
+        "id": "01",
+        "name": "Glory in Death",
+        "description": "Seize a second chance! This card grants you the mystical power to retry a Module Challenge.",
+        "function": "Retry a Module Challenge once.",
+        "limitation": "Can be used once only.",
+        "tag": "Second Chance",
+        "price": 500,
+        "image_src": "view/Card/card-01.png",
+        "type": "personal",
+        "subcat":["Module 1","Module 2","Module 3","Module 4","Just for Collection"]
+    },
+    
+  
+    {
+        "id": "02",
+        "name": "Mystery Munchies",
+        "description": "Crack the code of cravings! Redeem this card to take a spin at the capsule toy machine, and uncover which delectable snack awaits you. Will it be salty? Sweet? Only the machine knows. Keep your detective brain energized with this delightful surprise!",
+        "function": "Spin a surprise snack from the toy machine.",
+        "limitation": "Subject to availability.",
+        "tag": "Brain Fuel",
+        "price": 200,
+        "image_src": "view/Card/card-02.png",
+        "type": "personal"
+    },    
+    {
+        "id": "05",
+        "name": "Moriarty's Whisper",
+        "description": "Listen closely, Moriarty himself divulges a secret! This card allows a member of your group to ask a direct, pointed question about the draft lesson plan or teaching demonstration via email, and receive a detailed answer from the instructor. But beware, Moriarty's Whisper can only be used once per student, and questions must be sent no later than one week before the relevant assignment deadline.",
+        "function": "Ask a direct, pointed question about your draft lesson plan or teaching demonstration, and get a detailed reply via e-mail.",
+        "limitation": "Can only be used once per group; questions must be sent at least a week before the teaching demonstration.",
+        "tag": "Expert Assistance",
+        "price": 1500,
+        "image_src": "view/Card/card-05.png",
+        "type": "group"
+    },
+    {
+        "id": "06",
+        "name": "Sand Timer",
+        "description": "Turn the sands of time in your favor! This mystical timer grants your group an additional 1 minute for your Teaching Demo. Use it to dive deeper into your mysteries! ",
+        "function": "Add an extra 1 minute to your teaching demonstration.",
+        "limitation": "Can be used only once per group.",
+        "tag": "Time Management",
+        "price": 800,
+        "image_src": "view/Card/card-06.png",
+        "type": "group"
+    },
+    {
+        "id": "07",
+        "name": "Hidden Gem",
+        "description": "This enchanted gem grants your group access to an archive of stellar lesson plans. Utilize these invaluable resources to craft a lesson worthy of the greatest detectives!",
+        "function": "Access an archive of top-quality lesson plans.",
+        "tag": "Expert Assistance",
+        "price": 1000,
+        "image_src": "view/Card/card-07.png",
+        "type": "group"
+    },
+    {
+        "id": "08",
+        "name": "Teleport",
+        "description": "Manipulate time and space! With this magical card, your group can choose your desired teaching demonstration slot. Seize this chance to perform when the stars align for your success!",
+        "function": "Choose your teaching demonstration time slot.",
+        "limitation": "First come, first served. If any early time slot remains unchosen, the order of subsequent slots will be adjusted. For example, if the 1st and 2nd slots are taken, but the 3rd isn't, then the 4th slot becomes the 3rd, and so on.",
+        "tag": "Time Management",
+        "price": 500,
+        "image_src": "view/Card/card-08.png",
+        "type": "group",
+        "subcat":["M5(1) - 1st group", "M5(1) - 2nd group", "M5(1) - 3rd group", "M5(1) - 4th group", "M5(2) - 1st group", "M5(2) - 2nd group", "M5(2) - 3rd group", "M5(2) - 4th group", "M5(3) - 1st group", "M5(3) - 2nd group", "M5(3) - 3rd group", "M5(3) - 4th group"]
+    },
+    {
+        "id": "09",
+        "name": "Super Sherlock Squad",
+        "description": "Great job! You are finally qualified to nurture the next generation of Sherlock Holes for us to defeat!",
+        "function": "Recognition of your exceptional teaching and facilitation skills.",
+        "limitation": "Unlocked by being selected as the best teaching team by your peers",
+        "tag": "Achievement Unlocked",
+        "price": "Not for sale - Awarded exclusively to the top-performing groups in the teaching demonstration.",
+        "image_src": "view/Card/card-09.png"
+    },
+    {
+        "id": "10",
+        "name": "Bonus Challenge Conquerors",
+        "description": "Congratulations on unlocking all the bonus challenges! Your teamwork and tireless effort dedicated to mastering each task have prepared you well for the journey ahead in teaching. You’ve delved into every opportunity to learn and grow. Here’s to you, future educators, ready to inspire and guide the next generation with confidence and skills!",
+        "function": "Recognition of your effort and gain of knowledge through completing the challenges.",
+        "limitation": "Unlocked by completing all group bonus challenges",
+        "tag": "Achievement Unlocked",
+        "price": 0,
+        "image_src": "view/Card/card-10.png"
+    },
+    {
+        "id": "11",
+        "name": "Spectator Mode",
+        "description": "Activate your observational powers! This mystical lens allows you to join a peer's teaching demonstration as an observer. Gain invaluable insights and learn from your fellow detectives-in-training!",
+        "function": "Join a peer's teaching demonstration as an observer to gain insights and learn from them.",
+        "limitation": "One per student.",
+        "tag": "Expert Assistance",
+        "price": 500,
+        "image_src": "view/Card/card-11.png",
+        "type": "personal"
+    },
+    {
+        "id": "12",
+        "name": "Exodia",
+        "description": "Congratulations on completing all the individual challenges! Like the legendary Exodia, you've gathered a complete set of teaching tools. Your mastery of pedagogy is now unmatched! <br>To claim your Exodia card, click ' Exodia Obliterate!'. Your ultimate achievement will be verified and the card delivered upon completion of record checking.",
+        "function": "Recognition of completing all individual challenges.",
+        "tag": "Achievement Unlocked",
+        "limitation": "Unlocked by collecting all individual rewards",
+        "price": 0,
+        "image_src": "view/Card/card-12.png",
+        "type": "personal"
+    },
+    {
+        "id": "13",
+        "name": "Champ Select",
+        "description": "Assemble your dream team! This powerful artifact allows you to handpick your facilitators for the ultimate teaching demonstration. ",
+        "function": "Pick your own facilitators for your teaching demonstration.",
+        "limitation": "Must be purchased before M5 begins.",
+        "tag": "Expert Assistance",
+        "type": "group",
+        "price": 2500,
+        "image_src": "view/Card/card-13.png"
+    },
+    {
+        "id":"14",
+        "name": "Practice Mode",
+        "description": "Practice your teaching skills in a private session! This card grants you a dedicated 15-minute slot (10 minutes teaching + 5 minutes feedback) to practice your teaching individually or explore classroom equipment individually with personalized instructor guidance. Whether you're the facilitator of your group or not, take advantage of this opportunity to build your confidence and practice in a low-pressure environment.<br>Note: Available to all students (not restricted to group facilitators)",
+        "function": "Schedule a private 15-minute session to either:<ul><li>Practice your teaching and receive personalized feedback, or;</li><li>Familiarize yourself with classroom equipment and setup.</li></ul>",
+        "limitation": "<ul><li>Must submit teaching materials 2 days before session.</li><li>Time slots available on first-come-first-served basis.</li><li>No changes to selected time slot after purchase.</li><li>One session per student.</li><li>You can only use the remaining time in your slot if you are late.</li></ul>",
+        "tag": "Expert Assistance",
+        "type": "personal",
+        "price": 1000,
+        "image_src": "view/Card/card-14.png",
+        "subcat":["14:30- 14:45, April 1", "14:45- 15:00, April 1", "15:00- 15:15, April 1", "15:15- 15:30, April 1", "15:30- 15:45, April 1", "15:45- 16:00, April 1", "16:00- 16:15, April 1", "16:15- 16:30, April 1", "14:30- 14:45, April 3", "14:45- 15:00, April 3", "15:00- 15:15, April 3", "15:15- 15:30, April 3", "15:30- 15:45, April 3","15:45- 16:00, April 3","16:00- 16:15, April 3","16:15- 16:30, April 3"]
+    }   
+    ]
+}
