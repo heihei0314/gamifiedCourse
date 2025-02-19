@@ -1,0 +1,905 @@
+
+function myFunction() {
+  
+}
+function doGet(e) {
+  var params = e.parameter;
+  var action = params.action;
+  var result;
+  switch(action){
+    case "getInfo":
+      result = getInfo(params);
+      break;
+    case "getLeaderboard":
+      result = getLeaderboard(params);
+      break;
+    case "setTransaction":
+      result = setTransaction(params);
+      break;
+    case "getGroupTransaction":
+      result = getGroupTransaction(params);
+      break;
+    case "getTransaction":
+      result = getTransaction(params);
+      break;
+    case "setMCGrade":
+      result = setMCGrade(params);
+      break;
+    case "setMTGroup":
+      result = setMTGroup(params);
+      break;
+    case "setItemList":
+      result = setItemList(params);
+      break;
+    case "getItem":
+      result = getItem(params);
+      break;
+    case "getItemAmount":
+      result = getItemAmount(params);
+      break;
+    case "setPurchase":
+      result = setPurchase(params);
+      break;
+    case "postTransfer":
+      result = postTransfer(params);
+      break;
+  }
+  //return ContentService.createTextOutput(true);
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getInfo(query) {
+  var uid = query.uid;
+  var cohort = query.cohort;
+
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("studentList");
+
+  var LastRow = Sheet.getLastRow();
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 6);
+
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][2] == uid && listAll[i][0] == cohort) {      
+      var leaderboardSheet = SpreadSheet.getSheetByName("leaderboard");
+      var grouplistAll = leaderboardSheet.getSheetValues(2, 1, LastRow, 4);
+      for (var n = 0; n < grouplistAll.length; n++) {
+        if (listAll[i][1] == grouplistAll[n][1] && listAll[i][4] == grouplistAll[n][2] && cohort == grouplistAll[n][0]) {  
+          var groupmCoins = grouplistAll[n][3];
+        }  
+      }  
+      data = { 
+              "classSession": listAll[i][1],
+              "MTGroup": listAll[i][4],
+              "mCoins": listAll[i][5],
+              "groupmCoins": groupmCoins
+            };
+      break;
+    }
+  }
+  console.log(data);
+  return data;
+}
+
+function getLeaderboard(query) {
+  var cohort = query.cohort;
+
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("leaderboard");
+
+  var LastRow = Sheet.getLastRow();
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 7);
+
+  var classList = [];
+  var groupList = [];
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    
+    if (listAll[i][0] == cohort) {
+      classSession = listAll[i][1];
+      var BCAmount = listAll[i][6];
+      if(!classList.includes(classSession)){
+        classList.push(classSession);
+      }
+
+      //update Bonus Challenge in groupTransaction
+      var Sheet2 = SpreadSheet.getSheetByName("groupTransaction")
+      var LastRow2 = Sheet2.getLastRow();
+      //update Bonus Challenge
+      var listTransaction = Sheet2.getSheetValues(2, 1, LastRow2,5);
+      for(var n = 0;n < listTransaction.length; n++){     
+        //var range =  Sheet2.getRange(n,1,1,).getValues()   
+        if(listTransaction[n][0] == listAll[i][0] && listTransaction[n][1] == listAll[i][1] && listTransaction[n][2] == listAll[i][2] && listTransaction[n][3] == "Bonus Challenge (Group)"){
+          console.log(listAll[i][0],listAll[i][1],listAll[i][2],listAll[i][3],listAll[i][5]);
+          console.log(Sheet2.getRange(n+2,1,1,5).getValues());
+          Sheet2.getRange(n+2, 5).setValue(listAll[i][6]);
+          break;
+        }
+      }  
+    }
+    var group = {
+      "cohort": listAll[i][0],
+      "classSession": listAll[i][1],
+      "Group": listAll[i][2],
+      "mCoins": listAll[i][3],
+      "Assets": listAll[i][4],
+      "Items": listAll[i][5] 
+    };
+    groupList.push(group);
+  }
+
+  var individualListSheet = SpreadSheet.getSheetByName("studentList");
+  var individualListLastRow = individualListSheet.getLastRow();
+  var individualListAll = individualListSheet.getSheetValues(2, 1, individualListLastRow, 8);
+
+  var individualList = [];
+  // find mapping data and Push Array
+  for (var i = 0; i < individualListAll.length; i++) {
+    
+
+      var individual = {
+          "cohort": individualListAll[i][0],
+          "classSession": individualListAll[i][1],
+          "uid": individualListAll[i][2],
+          "name": individualListAll[i][3],
+          "mCoins": individualListAll[i][5],
+          "Assets": individualListAll[i][6],
+          "Items": individualListAll[i][7] 
+      };
+      individualList.push(individual);  
+    
+  }
+  data = {
+          "classList": classList,
+          "groupList": groupList,
+          "individualList": individualList
+        };
+  console.log(data);
+  return data;
+}
+
+function updateTransaction(query){
+  var uid = query.uid;
+  var cohort = query.cohort;
+  console.log("Update: "+uid)
+  //update module challenge info 
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("MCGrade");
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 7);
+  var M1,M2,M3,M4;
+  var M1Full = 3, M2Full = 3,M3Full = 3,M4Full = 6;
+  var MCCoins = 50;
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][2] == uid && listAll[i][0] == cohort) {      
+      M1=parseInt(listAll[i][3]);
+      M2=parseInt(listAll[i][4]);
+      M3=parseInt(listAll[i][5]);
+      M4=parseInt(listAll[i][6]);
+      break;
+    }
+  }
+  if (M1>=M1Full){
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 1",amount:MCCoins};
+  }
+  else {
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 1",amount:0};
+  }
+  setTransaction(transactionData);
+
+  if (M2>=M2Full){
+     var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 2",amount:MCCoins}
+  }
+  else {
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 2",amount:0};
+  }
+  setTransaction(transactionData);
+  
+  if (M3>=M3Full){
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 3",amount:MCCoins};
+  }
+  else {
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 3",amount:0};
+  }
+  setTransaction(transactionData);
+
+  if (M4>=M4Full){
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 4",amount:MCCoins};
+  }
+  else {
+    var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Module Challenge 4",amount:0};
+  }
+  setTransaction(transactionData);
+ 
+  //console.log(transactionData)
+
+  //update individual bouns challenge info 
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("studentList");
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 9);
+  var bc=0;
+  var MTGroup = '';
+  var classSession = '';
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][2] == uid && listAll[i][0] == cohort) {      
+      classSession=listAll[i][1];
+      MTGroup=listAll[i][4];
+      bc=listAll[i][8];
+      break;
+    }
+  }
+  var transactionData = {cohort: cohort,uid: uid,date: "System Update",description:"Bonus Challenge (Individual)",amount:bc}
+  setTransaction(transactionData);
+
+  updateGroupBC(cohort, classSession, MTGroup)
+}
+
+function updateGroupBC(cohort, classSession, MTGroup){
+    //update group bonus challenge info 
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("leaderboard");
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 7);
+  var bcg=0;
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][1] == classSession && listAll[i][0] == cohort && listAll[i][2] == MTGroup) {      
+      bcg=listAll[i][6];
+      break;
+    }
+  }
+  var groupTransactionData = { cohort:cohort,
+                          classSession:classSession,
+                          MTGroup:MTGroup,
+                          description:"Bonus Challenge (Group)",
+                          amount:bcg
+                        }
+  setGroupTransaction(groupTransactionData);
+}
+
+function getTransaction(query) {
+  var uid = query.uid;
+  var cohort = query.cohort;
+  //var uid = 'phpTest';
+  //var cohort = "phpTest2023";
+
+  updateTransaction(query);
+
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("transaction");
+
+  var LastRow = Sheet.getLastRow();
+  var data = [];
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 6);
+
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][1] == uid && listAll[i][0] == cohort) {      
+      transaction = { 
+                    "date": listAll[i][2],
+                    "description": listAll[i][3],
+                    "amount": listAll[i][4] 
+                    };
+      data.push(transaction);
+      //console.log(listAll);
+    }
+  }
+  return data;
+}
+
+function getGroupTransaction(query) {
+  var cohort = query.cohort;
+  var classSession = query.classSession;
+  var MTGroup = query.MTGroup;
+  
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  
+  //update group bonus challenge info 
+  //updateTransaction(query);  
+  var Sheet = SpreadSheet.getSheetByName("leaderboard");
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 7);
+  var bcg=0;
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][1] == classSession && listAll[i][0] == cohort && listAll[i][2] == MTGroup) {      
+      bcg=listAll[i][6];
+      break;
+    }
+  }
+
+  //grab data
+  var Sheet = SpreadSheet.getSheetByName("groupTransaction");
+
+  var LastRow = Sheet.getLastRow();
+  var data = [];
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 5);
+
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][0] == cohort && listAll[i][1] == classSession && listAll[i][2] == MTGroup) {      
+      var groupTransaction = { 
+                    "description": listAll[i][3],
+                    "amount": listAll[i][4] 
+                    };
+      data.push(groupTransaction);
+      //console.log(listAll);
+    }
+  }
+  return data;
+}
+
+function setMCGrade(data){
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("MCGrade");
+  var LastRow = Sheet.getLastRow();
+  
+  console.log(data.dataText)
+  var MCList = JSON.parse(data.dataText);
+  for(var r=0;r<MCList.MCGrade.length;r++){
+    var cohort = MCList.MCGrade[r].cohort;
+    var classSession = MCList.MCGrade[r].classSession;
+    var uid = MCList.MCGrade[r].uid;
+    var M1 = MCList.MCGrade[r].M1;
+    var M2 = MCList.MCGrade[r].M2;
+    var M3 = MCList.MCGrade[r].M3;
+    var M4 = MCList.MCGrade[r].M4;
+    //console.log(data)
+
+    var update=0;
+    var listAll = Sheet.getSheetValues(1, 1, LastRow, 7);
+    for(var i = 0;i < listAll.length; i++){
+      if(listAll[i][0] == cohort && listAll[i][2] ==uid){
+        Sheet.getRange(i+1, 4).setValue(M1);
+        Sheet.getRange(i+1, 5).setValue(M2);
+        Sheet.getRange(i+1, 6).setValue(M3);
+        Sheet.getRange(i+1, 7).setValue(M4);
+        update=1;
+        break;
+      }
+    }
+    if(update==0){
+      //取得 LastRow = 有資料的最後一行的位置
+      LastRow = Sheet.getLastRow();
+      //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+      Sheet.getRange(LastRow+1, 1).setValue(cohort);
+      Sheet.getRange(LastRow+1, 2).setValue(classSession);
+      Sheet.getRange(LastRow+1, 3).setValue(uid);
+      Sheet.getRange(LastRow+1, 4).setValue(M1);
+      Sheet.getRange(LastRow+1, 5).setValue(M2);
+      Sheet.getRange(LastRow+1, 6).setValue(M3);
+      Sheet.getRange(LastRow+1, 7).setValue(M4);
+    }
+
+    query = {
+      cohort: cohort,
+      uid: uid,
+    }
+    updateTransaction(query);
+  }
+  return "Done";
+}
+
+function setPurchase(data){
+  var cohort = data.cohort;
+  var classSession = data.classSession;
+  var MTGroup = data.MTGroup;
+  var purchaseList = JSON.parse(data.dataText);
+  var uid = data.uid;
+  var groupTransactionAmount = data.groupTransactionAmount;
+  var transactionAmount = data.transactionAmount;
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("itemStatus")
+
+
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var soldoutList = checkAmount(purchaseList.purchaseList,classSession);
+  console.log(transactionAmount)
+  if (checkGroupBalance(cohort, classSession, MTGroup, groupTransactionAmount)==0 && groupTransactionAmount!=0){
+    return 'not enough balance';
+  }
+  if (checkBalance(cohort, uid, transactionAmount)==0 && transactionAmount!=0){
+    return 'not enough balance';
+  }
+  if (soldoutList.length==0){
+    //update item status
+    for(var i = 0;i < purchaseList.purchaseList.length; i++){
+      console.log(purchaseList.purchaseList[i]);
+      LastRow = Sheet.getLastRow()
+      Sheet.getRange(LastRow+1, 1).setValue(cohort);
+      Sheet.getRange(LastRow+1, 2).setValue(classSession);
+      Sheet.getRange(LastRow+1, 3).setValue(purchaseList.purchaseList[i].id);
+      Sheet.getRange(LastRow+1, 6).setValue(purchaseList.purchaseList[i].subcat);
+      Sheet.getRange(LastRow+1, 7).setValue(purchaseList.purchaseList[i].name);
+      if(purchaseList.purchaseList[i].type == "group"){
+        Sheet.getRange(LastRow+1, 4).setValue(MTGroup);
+      }else{
+        Sheet.getRange(LastRow+1, 4).setValue(uid);
+      }
+      Sheet.getRange(LastRow+1, 5).setValue(0);
+    }
+
+    //update personal transaction
+    if(transactionAmount!=0){
+      var transactionData = { cohort:cohort,
+                          uid:uid,
+                          date:Utilities.formatDate(new Date(), "GMT+8", "yyyy/MM/dd HH:mm"),
+                          description:"Purchasing Item",
+                          amount:transactionAmount*-1
+                        }
+      setTransaction(transactionData);
+    }
+    //update group transaction
+    if(groupTransactionAmount!=0){
+      var groupTransactionData = { cohort:cohort,
+                          classSession:classSession,
+                          MTGroup:MTGroup,
+                          description:"Purcashing Item",
+                          amount:groupTransactionAmount*-1
+                        }
+      setGroupTransaction(groupTransactionData);
+    }
+    //update itemList
+    updateAmount(purchaseList.purchaseList, classSession);
+    return "Purchase Successful";
+  }
+  else {
+    //refuse purchasing because of sold out
+    console.log(JSON.stringify(soldoutList));
+    return JSON.stringify(soldoutList);
+  }
+}
+function updateAmount(purchaseList, classSession){
+  var itemID = []
+  var subcat = []
+  for ( i in purchaseList) {
+    itemID.push(purchaseList[i].id)
+    subcat.push(purchaseList[i].subcat)
+  }
+  console.log(subcat);
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("itemList")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 5);
+  
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == classSession && itemID.includes(listAll[i][1]) && subcat.includes(listAll[i][3])){//
+      Sheet.getRange(i+1, 3).setValue(listAll[i][2]-1);
+    }
+  }      
+}
+function checkAmount(purchaseList, classSession){
+  var itemID = []
+  var subcat = []
+  for ( i in purchaseList) {
+    itemID.push(purchaseList[i].id)
+    subcat.push(purchaseList[i].subcat)
+  }
+  
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("itemList")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 5);
+  
+  soldoutList=[];
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == classSession && itemID.includes(listAll[i][1]) && subcat.includes(listAll[i][3])){//
+      if(listAll[i][2] ==0){
+        soldoutList.push(listAll[i][1]);
+      }
+    }
+  }
+  console.log(soldoutList)
+  return soldoutList;
+}
+function checkGroupBalance(cohort, classSession, MTGroup, checkAmount){
+  console.log('checkgroupbalance');
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("leaderboard")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 4);
+  
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == cohort && listAll[i][1] == classSession && listAll[i][2] == MTGroup && listAll[i][3] < checkAmount){//
+    
+      console.log(checkAmount);
+      return 0;
+    }
+  }
+  console.log(listAll[1][3]);
+  return 1;
+}
+function checkBalance(cohort, uid, checkAmount){
+  console.log('checkbalance');
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("studentList")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 6);
+  
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][2] == uid && listAll[i][0] == cohort && listAll[i][5] < checkAmount){//
+    
+      console.log(checkAmount);
+      return 0;
+    }
+  }
+  console.log(listAll[1][4]);
+  return 1;
+}
+function setGroupTransaction(data){
+  var cohort = data.cohort;
+  var classSession = data.classSession;
+  var MTGroup = data.MTGroup;
+  var description = data.description;
+  var amount = data.amount;
+
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("groupTransaction")
+
+
+    //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  
+  var update = 0;
+  if (description.startsWith("Bonus Challenge")){
+    console.log(description)
+    var listAll = Sheet.getSheetValues(1, 1, LastRow,5);
+    for(var i = 0;i < listAll.length; i++){
+      if(listAll[i][0] == cohort && listAll[i][1] == classSession && listAll[i][2] == MTGroup && listAll[i][3] == description){
+        Sheet.getRange(i+1, 5).setValue(amount);
+        update=1;
+        break;
+      }
+    }
+    if (update==0){
+      Sheet.getRange(LastRow+1, 1).setValue(cohort);
+      Sheet.getRange(LastRow+1, 2).setValue(classSession);
+      Sheet.getRange(LastRow+1, 3).setValue(MTGroup);
+      Sheet.getRange(LastRow+1, 4).setValue(description);
+      Sheet.getRange(LastRow+1, 5).setValue(amount);
+    }
+  }
+  else{
+    //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+    Sheet.getRange(LastRow+1, 1).setValue(cohort);
+    Sheet.getRange(LastRow+1, 2).setValue(classSession);
+    Sheet.getRange(LastRow+1, 3).setValue(MTGroup);
+    Sheet.getRange(LastRow+1, 4).setValue(description);
+    Sheet.getRange(LastRow+1, 5).setValue(amount);
+  }
+  return "Done";
+}
+
+function setTransaction(data){
+  var cohort = data.cohort;
+  var uid = data.uid;
+  var date = data.date;
+  var description = data.description;
+  var amount = data.amount;
+  console.log("set: "+uid);
+
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("transaction")
+
+
+    //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  var update = 0;
+  if (description.startsWith("Module Challenge")||description.startsWith("Bonus Challenge")){
+    console.log("insert Module Challenage")
+    var listAll = Sheet.getSheetValues(1, 1, LastRow,5);
+    for(var i = 0;i < listAll.length; i++){
+      if(listAll[i][0] == cohort && listAll[i][1] ==uid && listAll[i][3] == description){
+        Sheet.getRange(i+1, 5).setValue(amount);
+        update=1;
+        break;
+      }
+    }
+    if (update==0){
+      Sheet.getRange(LastRow+1, 1).setValue(cohort);
+      Sheet.getRange(LastRow+1, 2).setValue(uid);
+      Sheet.getRange(LastRow+1, 3).setValue(date);
+      Sheet.getRange(LastRow+1, 4).setValue(description);
+      Sheet.getRange(LastRow+1, 5).setValue(amount);
+    }
+  }
+  else{
+    console.log("insert transaction")
+    //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+    Sheet.getRange(LastRow+1, 1).setValue(cohort);
+    Sheet.getRange(LastRow+1, 2).setValue(uid);
+    Sheet.getRange(LastRow+1, 3).setValue(date);
+    Sheet.getRange(LastRow+1, 4).setValue(description);
+    Sheet.getRange(LastRow+1, 5).setValue(amount);
+  }
+
+  return "Done";
+}
+
+function setMTGroup(data){
+  var groupList = JSON.parse(data.dataText);
+  for(var r=0;r<groupList.MTGroup.length;r++){
+  var cohort = groupList.MTGroup[r].cohort;
+  var classSession = groupList.MTGroup[r].classSession;
+  var uid = groupList.MTGroup[r].uid;
+  var name = groupList.MTGroup[r].name;
+  var MTGroup = groupList.MTGroup[r].MTGroup;
+
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("studentList")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+
+  var update=0;
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 9);
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == cohort && listAll[i][2] ==uid){
+      Sheet.getRange(i+1, 5).setValue(MTGroup);
+      update=1;
+      break;
+    }
+  }
+  if(update==0){
+    //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+    var currentRow = LastRow+1;
+    Sheet.getRange(currentRow, 1).setValue(cohort);
+    Sheet.getRange(currentRow, 2).setValue(classSession);
+    Sheet.getRange(currentRow, 3).setValue(uid);
+    Sheet.getRange(currentRow, 4).setValue(name);
+    Sheet.getRange(currentRow, 5).setValue(MTGroup);
+    Sheet.getRange(currentRow, 6).setValue("=sumifs(transaction!E:E,transaction!A:A,A"+currentRow+",transaction!B:B,C"+currentRow+")");
+    Sheet.getRange(currentRow, 7).setValue("=sumifs(transaction!E:E,transaction!A:A,A"+currentRow+",transaction!B:B,C"+currentRow+",transaction!D:D,\"<>Purchasing Item\")"); 
+    Sheet.getRange(currentRow, 8).setValue("=countifs(itemStatus!A:A,A"+currentRow+",itemStatus!B:B,B"+currentRow+",itemStatus!D:D,C"+currentRow+")"); 
+    Sheet.getRange(currentRow, 9).setValue("=sum(J"+currentRow+":R"+currentRow+")");
+    setLeaderboard(cohort, classSession, MTGroup);
+  }
+  }
+  return "Done";
+}
+function setLeaderboard(cohort, classSession, MTGroup){
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("leaderboard")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+
+  var update=0;
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 8);
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == cohort && listAll[i][1] ==classSession && listAll[i][2] ==MTGroup){
+      update=1;
+      break;
+    }
+  }
+  if(update==0){
+    //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+    var currentRow = LastRow+1;
+    Sheet.getRange(currentRow, 1).setValue(cohort);
+    Sheet.getRange(currentRow, 2).setValue(classSession);
+    Sheet.getRange(currentRow, 3).setValue(MTGroup);
+    //var formula="=sumifs(studentList!E:E,studentList!A:A,A"+currentRow+",studentList!D:D,C"+currentRow+")+sumifs(groupTransaction!E:E,groupTransaction!B:B,B"+currentRow+",groupTransaction!C:C,C"+currentRow+")";
+    var formula="=sumifs(groupTransaction!E:E,groupTransaction!A:A,A"+currentRow+",groupTransaction!B:B,B"+currentRow+",groupTransaction!C:C,C"+currentRow+")";
+    Sheet.getRange(currentRow, 4).setValue(formula);
+    Sheet.getRange(currentRow, 5).setValue("=sumifs(groupTransaction!E:E,groupTransaction!A:A,A"+currentRow+",groupTransaction!B:B,B"+currentRow+",groupTransaction!C:C,C"+currentRow+",groupTransaction!D:D,\"<>Purcashing Item\")");
+    Sheet.getRange(currentRow, 6).setValue("=countifs(itemStatus!A:A,A"+currentRow+",itemStatus!B:B,B"+currentRow+",itemStatus!D:D,C"+currentRow+")");
+    Sheet.getRange(currentRow, 7).setValue("=sum(H"+currentRow+":Q"+currentRow+")");
+  }
+}
+
+
+function setItemList(data){
+  var itemList = JSON.parse(data.dataText);
+  for(var r=0;r<itemList.itemList.length;r++){
+  var classSession = itemList.itemList[r].classSession;
+  var item = itemList.itemList[r].item;
+  var subcat = itemList.itemList[r].subcat;
+  var amount = itemList.itemList[r].amount;
+
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("itemList")
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+
+  var update=0;
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 5);
+  for(var i = 0;i < listAll.length; i++){
+    if(listAll[i][0] == classSession && listAll[i][1] ==item && listAll[i][3] ==subcat){
+      Sheet.getRange(i+1, 3).setValue(amount);
+      update=1;
+      break;
+    }
+  }
+  if(update==0){
+    //開始寫入資料 同樣是 getRange 選擇 (行,欄) setValue 帶入值name phone time order price values進來
+    Sheet.getRange(LastRow+1, 1).setValue(classSession);
+    Sheet.getRange(LastRow+1, 2).setValue(item);
+    Sheet.getRange(LastRow+1, 3).setValue(amount);
+    Sheet.getRange(LastRow+1, 4).setValue(subcat);
+    Sheet.getRange(LastRow+1, 5).setValue(name);
+  }
+  }
+  return "Done";
+}
+
+function getItem(query) {
+  var uid = query.uid;
+  var cohort = query.cohort;
+  var classSession = query.classSession;
+  var MTGroup = query.MTGroup;
+
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("itemStatus");
+
+  var LastRow = Sheet.getLastRow();
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 6);
+
+  var Items =[];
+  var UsedItems =[];
+  var deliveredItems =[];
+  var groupItems =[];
+  var groupUsedItems =[];
+  var groupDeliveredItems =[];
+  var itemsSubCat =[];
+  var groupItemsSubCat =[];
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][3] == uid && listAll[i][0] == cohort) {      
+      Items.push(listAll[i][2]); 
+      if (listAll[i][5].length>0){
+        itemsSubCat.push(listAll[i][5]);
+      }
+      if (listAll[i][4]==1){
+        UsedItems.push(listAll[i][2]); 
+      }
+      else if(listAll[i][4]==2){
+        deliveredItems.push(listAll[i][2]); 
+      }
+    }
+    if (listAll[i][3] == MTGroup && listAll[i][0] == cohort && listAll[i][1] == classSession) {      
+      groupItems.push(listAll[i][2]); 
+      if (listAll[i][5].length>0){
+        groupItemsSubCat.push(listAll[i][5]);
+      }
+      if (listAll[i][4]==1){
+        groupUsedItems.push(listAll[i][2]); 
+      }
+      else if(listAll[i][4]==2){
+        groupDeliveredItems.push(listAll[i][2]); 
+      }
+    }
+  }
+  data = { 
+    "Items":Items,
+    "UsedItems":UsedItems,
+    "deliveredItems":deliveredItems,
+    "groupItems":groupItems,
+    "groupUsedItems":groupUsedItems,
+    "groupDeliveredItems":groupDeliveredItems,
+    "itemsSubCat":itemsSubCat,
+    "groupItemsSubCat":groupItemsSubCat
+  }
+  console.log(data);
+  return data;
+}
+
+function getItemAmount(query) {
+  var classSession = query.classSession;
+  console.log(classSession);
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  var Sheet = SpreadSheet.getSheetByName("itemList");
+
+  var LastRow = Sheet.getLastRow();
+
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(2, 1, LastRow, 5);
+
+  var Items =[];
+  var Amount =[];
+  // find mapping data and Push Array
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][0] == classSession) {      
+      Items.push(listAll[i][1]+listAll[i][3]); 
+      Amount.push(listAll[i][2]);
+    }
+  }
+  data = { 
+    "Items":Items,
+    "Amount":Amount,
+  }
+  console.log(data);
+  return data;
+}
+
+function postTransfer(data){
+  var cohort = data.cohort;
+  var sender = data.sender;
+  var reciever = data.reciever;
+  var transferAmount = data.transferAmount;
+  //這是選擇這個google excel
+  var SpreadSheet = SpreadsheetApp.openById("1pkq-x17LM2E0a3BiaGr1SwFQz9x4cF_maZ9iCicmJHo");
+  //取得表單
+  var Sheet = SpreadSheet.getSheetByName("studentList")
+  console.log('posttransfer');
+
+  if (checkBalance(cohort, sender, transferAmount)==0){
+    return 'not enough balance';
+  }
+
+  //取得 LastRow = 有資料的最後一行的位置
+  var LastRow = Sheet.getLastRow();
+  // get All data as Array
+  // first row, first column, last row, six columns
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, 3);
+
+  var findReceiver = 0;
+  for (var i = 0; i < listAll.length; i++) {
+    if (listAll[i][0] == cohort && listAll[i][2] == reciever) {      
+      var transactionData = { cohort:cohort,
+                          uid:sender,
+                          date:Utilities.formatDate(new Date(), "GMT+8", "yyyy/MM/dd HH:mm"),
+                          description:"Groupmate Transfer",
+                          amount:transferAmount*-1
+                        }
+      setTransaction(transactionData);
+      var transactionData = { cohort:cohort,
+                          uid:reciever,
+                          date:Utilities.formatDate(new Date(), "GMT+8", "yyyy/MM/dd HH:mm"),
+                          description:"Groupmate Transfer",
+                          amount:transferAmount
+                        }
+      setTransaction(transactionData);
+      
+    
+      findReceiver = 1;
+      return 'Transfer Successful';
+    }
+  }
+  if(findReceiver==0){
+    return "User not found";
+  }
+}
