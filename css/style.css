@@ -1,0 +1,181 @@
+
+body{
+    line-height:1.5em;
+    font-size: 1.2em;
+    font-family: 'Roboto';
+    font-weight:300;
+}
+
+.center{
+    margin: 0;
+    position: relative;
+    top: 0;
+    left:50%;
+    transform: translate(-50%,50%);
+}
+
+select{
+    font-size: 1.2em;
+}
+
+button{
+    font-size: 1.5em;
+    width:8em;
+    height:2.5em;
+}
+button:hover{
+    cursor:pointer;
+}
+
+.topnav{
+    position: fixed;
+    top:0em;
+    left:0;
+    width:calc(100vw - 2em);
+    overflow: hidden;
+    height: 2em;
+    padding: 1em 1em 1em 1em;
+    z-index:999;
+    background-color:white;
+}
+.topnav h2 {
+    line-height:1.5em;
+    display : inline;
+}
+.topnav a:hover {
+    cursor:pointer;
+}
+.topnav a {
+    color:black;
+    text-decoration: none;
+    margin-right: 1.5em;
+}
+.topBtnContainer{
+    position:absolute;
+    right:0;
+    padding-top:0.5em;
+    margin-right: 1.5em;
+}
+  
+.main{
+    position:absolute;
+    top:4em;
+    left:0;
+    margin: 0 0 0 0;
+    width:100vw;
+    height:auto;
+    overflow: scroll;
+    display:none;
+}
+
+.section{
+    background-color: #F3F4F4;
+    min-height:calc(100vh - 4em);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.leftBox{
+    position: absolute;
+    top:0;
+    left:0;
+    width:50vw;
+}  
+.rightBox{
+    position: absolute;
+    top:0;
+    right:0;
+    width:50vw;
+    height:100%;
+}  
+
+.flex-row {
+    display: flex;
+    flex-flow: row wrap;
+    text-align: center;
+  }
+.col-4 {
+    background-color: #d9d0e3;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    flex: 20%;
+    height: 40vh;
+}
+.col-3 {
+    background-color: #d9d9d9;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    flex: 20%;
+    height: 40vh;
+    border-radius: 1em;
+}
+.col-4 p, .col-3 p{
+    display: inline-block;
+    line-height: 1.5em;
+    font-size:2em;
+    top: 20vh;
+    left:0;
+    transform: translate(0%,-50%);
+}
+.col-3 p{
+    transform: translate(0%,-40%);
+}
+
+span{
+    height:100%;
+}
+.flex-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+.flex-row button{
+    background-color: transparent;
+    font-size: 1.5em;
+    width:8em;
+    height:2.5em;
+    border:0;
+}
+.inactivebutton{
+    color: #d9d9d9;
+}
+.flex-row .activeBtn{
+    color: black;
+}
+.flex-row .activePagebutton{
+    color: black;
+}
+
+
+h2{
+    font-weight:400;
+}
+.title{
+    font-size:3em;
+    line-height:1em;
+    font-weight:400;
+}
+.squaretitle{
+    font-size:1.5em;
+    line-height:1em;
+}
+
+.active{
+    display:block;
+}
+.singleImg{
+    width: 40%;
+    transform: translate(50%,20%);
+}  
+td{
+    padding-left:1em;
+    padding-right:1em;
+}
+td button{
+    font-size:1em;
+    height:2em;
+    width:2em;
+}
+.icon{
+    width:3em;
+}
